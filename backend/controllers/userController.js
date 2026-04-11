@@ -42,15 +42,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-//@desc Delete a user (Admin only)
-//@route DELETE /api/users/:id
-//@access Private (Admin)
-const deleteUser = async (req, res) => {
-  try {
 
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
-module.exports = { getUsers, getUserById, deleteUser }
+module.exports = { getUsers, getUserById, }
