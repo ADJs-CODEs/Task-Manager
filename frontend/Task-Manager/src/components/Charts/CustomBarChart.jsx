@@ -49,7 +49,7 @@ const CustomBarChart = ({ data }) => {
     return null;
   };
   return (
-    <div className="">
+    <div className="bg-white mt-6">
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid stroke='none' />
@@ -68,7 +68,13 @@ const CustomBarChart = ({ data }) => {
             dataKey="count"
             nameKey="priority"
             fill='#FF8042'
-            radius={[10, 10, 10, 10]} />
+            radius={[10, 10, 10, 10]}
+            activeDot={{ r: 8, fill: "yellow" }}
+            activeStyle={{ fill: "green" }}>
+            {data.map((entry, index) => (
+              <Cell key={index} fill={getBarColor(entry)} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

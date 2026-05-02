@@ -8,6 +8,7 @@ import {
   Legend,
 } from "recharts";
 import CustomToolstip from './CustomToolstip';
+import CustomLegend from './CustomLegend';
 
 
 

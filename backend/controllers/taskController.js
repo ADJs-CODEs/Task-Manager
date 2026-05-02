@@ -15,9 +15,9 @@ const getTasks = async (req, res) => {
     let tasks;
 
     if (req.user.role === "admin") {
-      tasks = await Task.find(filter).populate("assignedTo", "name email profile ImageUrl");
+      tasks = await Task.find(filter).populate("assignedTo", "name email profileImageUrl");
     } else {
-      tasks = await Task.find({ ...filter, assignedTo: req.user._id }).populate("assignedTo", "name email profile ImageUrl")
+      tasks = await Task.find({ ...filter, assignedTo: req.user._id }).populate("assignedTo", "name email profileImageUrl")
 
     }
     //Add completed todoChecklist count to each task 
@@ -91,7 +91,7 @@ const createTask = async (req, res) => {
       dueDate,
       assignedTo,
       attachments,
-      todoCheckList
+      todoChecklist
     } = req.body;
 
     if (!Array.isArray(assignedTo)) {
@@ -106,7 +106,7 @@ const createTask = async (req, res) => {
       dueDate,
       assignedTo,
       createdBy: req.user._id,
-      todoCheckList,
+      todoChecklist,
       attachments,
     });
     res.status(201).json({ message: "Task created successfully", task });
@@ -122,7 +122,7 @@ const createTask = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).jscon({ message: "Task not found" });
+    if (!task) return res.status(404).json({ message: "Task not found" });
 
     task.title = req.body.title || task.title;
     task.description = req.body.description || task.description;
@@ -197,7 +197,7 @@ const updateTaskChecklist = async (req, res) => {
     const { todoChecklist } = req.body;
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: "Task not found" });
-    if (!task.assignedTo.includes(req.user._) && req.user.role !== "admin") {
+    if (!task.assignedTo.includes(req.user._id) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized to update checklist" });
     }
     task.todoChecklist = todoChecklist; //Replace with updated checklist 

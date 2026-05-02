@@ -19,19 +19,70 @@
   }
 }
 
-.input-box {
-  @apply w-full flex justify-between gap-3 text-sm text-black bg-slate-100/50 rounded px-4 py-3 mb-4 mt-3 border border-slate-200 outline-none;
+/* --- High-Performance Component Utilities --- */
+
+@utility input-box {
+  @apply w-full flex justify-between gap-3 text-sm text-black bg-slate-100/50 rounded px-4 py-3 mb-4 mt-3 border border-slate-200 outline-none transition-all;
+  &:focus {
+    @apply border-primary/50 ring-2 ring-primary/5 bg-white;
+  }
 }
 
-
-.btn-primary {
-  @apply w-full text-sm font-medium text-white bg-primary shadow-lg shadow-purple-600/5 p-[10px] rounded-md my-1 hover:bg-blue-600/15 hover:text-blue-600 cursor-pointer;
+@utility btn-primary {
+  @apply w-full text-sm font-medium text-white bg-primary p-[10px] rounded-md my-1 cursor-pointer transition-all;
+  box-shadow: 0 10px 15px -3px rgba(147, 51, 234, 0.05); /* Purple-tinted shadow */
+  
+  &:hover {
+    @apply bg-blue-600/15 text-primary;
+  }
 }
 
-.card {
-  @apply bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50;
+@utility card {
+  @apply bg-white p-6 rounded-2xl border border-gray-200/50;
+  box-shadow: var(--shadow-portal);
 }
 
-.card-btn {
-  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-blue-50 px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer;
+@utility card-btn {
+  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer transition-colors;
+  &:hover {
+    @apply text-primary bg-blue-50;
+  }
+}
+
+@utility card-btn-fill {
+  @apply flex items-center gap-3 text-[12px] font-medium text-white bg-primary px-4 py-1.5 rounded-lg border border-primary cursor-pointer transition-all;
+  &:hover {
+    @apply bg-blue-50 text-primary;
+  }
+}
+
+@utility form-card {
+  @apply bg-white p-6 rounded-lg border border-gray-200/50;
+  box-shadow: var(--shadow-clinical);
+}
+
+@utility form-input {
+  @apply w-full text-sm text-black outline-none bg-white border border-slate-100 px-2.5 py-3 rounded-md mt-2 transition-all;
+  &::placeholder {
+    @apply text-gray-500;
+  }
+  &:focus {
+    @apply border-primary/40 ring-2 ring-primary/5;
+  }
+}
+
+@utility add-btn {
+  @apply w-full flex items-center justify-center gap-1.5 text-xs font-medium text-primary whitespace-nowrap bg-blue-50 border border-blue-100 rounded-lg px-4 py-2 cursor-pointer transition-transform active:scale-95;
+}
+
+@utility download-btn {
+  @apply flex items-center gap-3 text-xs md:text-[13px] text-lime-900 bg-lime-100 px-2 md:px-3 py-2 rounded border border-lime-200 cursor-pointer transition-all;
+  &:hover {
+    @apply border-lime-400 bg-lime-200/50;
+  }
+}
+
+@utility user-card {
+  @apply bg-white p-4 rounded-xl border border-gray-200/50;
+  box-shadow: var(--shadow-clinical);
 }

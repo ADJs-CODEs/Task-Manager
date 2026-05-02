@@ -11,6 +11,7 @@ import InfoCard from '../../components/Cards/infoCard';
 import TaskListTable from '../../components/layouts/TasklistTable';
 import { LuArrowRight } from 'react-icons/lu';
 import CustomPieChart from '../../components/Charts/CustomPieChart';
+import CustomBarChart from '../../components/Charts/CustomBarChart';
 
 
 const COLORS = ["#8D51FF", "#00BBDB", "#7BCE00"]
@@ -87,28 +88,28 @@ const Dashboard = () => {
 
         <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-5'>
           <InfoCard
-            label="Total Tasks"
+            label=" Total Tasks"
             value={addThousandSeperator(
               dashboardData?.charts?.taskDistribution?.All || 0
             )}
             color="bg-primary"
           />
           <InfoCard
-            label="Pending Tasks"
+            label=" Pending Tasks"
             value={addThousandSeperator(
-              dashboardData?.charts?.taskDistribution?.pending || 0
+              dashboardData?.charts?.taskDistribution?.Pending || 0
             )}
             color="bg-violet-500"
           />
           <InfoCard
-            label="In Progress Tasks"
+            label=" In Progress Tasks"
             value={addThousandSeperator(
               dashboardData?.charts?.taskDistribution?.InProgress || 0
             )}
             color="bg-cyan-500"
           />
           <InfoCard
-            label="Completed Tasks"
+            label=" Completed Tasks"
             value={addThousandSeperator(
               dashboardData?.charts?.taskDistribution?.Completed || 0
             )}
@@ -153,7 +154,6 @@ const Dashboard = () => {
               </button>
             </div>
             <TaskListTable tableData={dashboardData?.recentTasks || []} />
-            {JSON.stringify(dashboardData)}
           </div>
         </div>
       </div>

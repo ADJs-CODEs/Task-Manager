@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "./apiPaths";
+import { BASE_URL, API_PATHS } from "./apiPaths";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
 });
 
 //Request Interceptor
-
 axiosInstance.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("token");
   if (accessToken) {
@@ -27,14 +26,18 @@ axiosInstance.interceptors.request.use((config) => {
 );
 
 //Response Interceptor
-axiosInstance.interceptors.response.use((response) => {
-  return response;
-},
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
   (error) => {
     //Handle common errors globally
     if (error.response) {
-      if (error.response.status === 401) {
-        //Redirect to login page
+      if (
+        error.response.status === 401 &&
+        !error.config?.url?.includes(API_PATHS.AUTH.LOGIN)
+      ) {
+        //Redirect to login page for protected route failures
         window.location.href = "/login";
       } else if (error.response.status === 500) {
         console.error("Server error. please try again later.");
@@ -43,7 +46,8 @@ axiosInstance.interceptors.response.use((response) => {
       console.error("Request timeout. please try again.");
     }
     return Promise.reject(error);
-  });
+  }
+);
 
 
 export default axiosInstance;
