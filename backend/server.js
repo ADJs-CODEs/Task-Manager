@@ -1,39 +1,30 @@
-require("dotenv").config();
-const express = require("express")
+const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const connectDB = require("./config/db")
+require("dotenv").config();
+const connectDB = require("./config/db");
 
-//route imports
-const authRoutes = require("./routes/authRoutes")
-const userRoutes = require("./routes/userRoutes")
-const taskRoutes = require("./routes/taskRoutes")
-const reportRoutes = require("./routes/reportRoutes")
+const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const userRoutes = require("./routes/userRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const workspaceRoutes = require("./routes/workspaceRoutes");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-//Middleware to handle CORS
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
-
-//Middleware 
+// Middleware
+app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
 app.use(express.json());
 
-
-//Connect Database
+// Connect DB
 connectDB();
 
-//Routes
+// Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/workspaces", workspaceRoutes);
 
-//Start Server
-app.listen(PORT, () => console.log(`server running on port ${PORT}`));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

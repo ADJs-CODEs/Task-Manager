@@ -9,47 +9,47 @@ const axiosInstance = axios.create({
   },
 });
 
-//Request Interceptor
-axiosInstance.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem("token");
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  if (!(config.data instanceof FormData)) {
-    config.headers["Content-Type"] = "application/json";
-  }
+// Request Interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem("token");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
 
-  return config;
-},
+    // Attach active workspace ID to every request
+    const workspaceId = localStorage.getItem("activeWorkspaceId");
+    if (workspaceId) {
+      config.headers["x-workspace-id"] = workspaceId;
+    }
 
-  (error) => {
-    return Promise.reject(error);
-  }
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-//Response Interceptor
+// Response Interceptor
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    //Handle common errors globally
     if (error.response) {
       if (
         error.response.status === 401 &&
         !error.config?.url?.includes(API_PATHS.AUTH.LOGIN)
       ) {
-        //Redirect to login page for protected route failures
         window.location.href = "/login";
       } else if (error.response.status === 500) {
-        console.error("Server error. please try again later.");
+        console.error("Server error. Please try again later.");
       }
     } else if (error.code === "ECONNABORTED") {
-      console.error("Request timeout. please try again.");
+      console.error("Request timeout. Please try again.");
     }
     return Promise.reject(error);
   }
 );
-
 
 export default axiosInstance;

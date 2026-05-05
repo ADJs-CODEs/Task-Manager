@@ -1,18 +1,21 @@
 const express = require("express");
 const { protect, adminOnly } = require("../middlewares/authMiddleware");
-const { getDashboardData, getUserDashboardData, getTasks, getTaskById, createTask, updateTask, deleteTask, updateTaskStatus, updateTaskChecklist } = require("../controllers/taskController");
+const { resolveWorkspace } = require("../middlewares/workspaceMiddleware");
+const {
+  getDashboardData, getUserDashboardData, getTasks, getTaskById,
+  createTask, updateTask, deleteTask, updateTaskStatus, updateTaskChecklist,
+} = require("../controllers/taskController");
 
 const router = express.Router();
 
-// Task Management Routes
-router.get("/dashboard-data", protect, getDashboardData); // Get dashboard data
-router.get("/user-dashboard-data", protect, getUserDashboardData);
-router.get("/", protect, getTasks); //Get all tasks (Admin: all, User: assigned)
-router.get("/:id", protect, getTaskById); //Get task by ID 
-router.post("/", protect, adminOnly, createTask); //Create a task (Admin Only)
-router.put("/:id", protect, updateTask); //update task details
-router.delete("/:id", protect, adminOnly, deleteTask); //Delete task details
-router.put("/:id/status", protect, updateTaskStatus); //Update task status
-router.put("/:id/todo", protect, updateTaskChecklist); //Update task checklist
+router.get("/dashboard-data", protect, resolveWorkspace, getDashboardData);
+router.get("/user-dashboard-data", protect, resolveWorkspace, getUserDashboardData);
+router.get("/", protect, resolveWorkspace, getTasks);
+router.get("/:id", protect, resolveWorkspace, getTaskById);
+router.post("/", protect, adminOnly, resolveWorkspace, createTask);
+router.put("/:id", protect, resolveWorkspace, updateTask);
+router.delete("/:id", protect, adminOnly, resolveWorkspace, deleteTask);
+router.put("/:id/status", protect, resolveWorkspace, updateTaskStatus);
+router.put("/:id/todo", protect, resolveWorkspace, updateTaskChecklist);
 
 module.exports = router;

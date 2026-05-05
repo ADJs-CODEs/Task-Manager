@@ -1,27 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
-import { LuSun, LuMoon } from 'react-icons/lu';
-import SideMenu from './SideMenu';
-import { useTheme } from '../../context/ThemeContext';
+import { LuSun, LuMoon } from "react-icons/lu";
+import SideMenu from "./SideMenu";
+import { useTheme } from "../../context/ThemeContext";
+import WorkspaceSwitcher from "./WorkspaceSwitcher";
+import { useContext } from "react";
+import { UserContext } from "../../context/userContext";
 
 const Navbar = ({ activeMenu }) => {
   const [openSideMenu, setOpenSideMenu] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { user } = useContext(UserContext);
 
   return (
-    <div className={`flex items-center justify-between gap-5 backdrop-blur-md border-b py-3.5 px-7 sticky top-0 z-30 transition-colors duration-300
-      ${isDarkMode
-        ? "bg-[#1e293b]/90 border-white/6"
-        : "bg-white/80 border-gray-200/60"
-      }`}
-      style={{ boxShadow: '0 1px 20px rgba(0,0,0,0.06)' }}>
-
+    <div
+      className={`flex items-center justify-between gap-5 backdrop-blur-md border-b py-3.5 px-7 sticky top-0 z-30 transition-colors duration-300
+        ${isDarkMode
+          ? "bg-[#1e293b]/90 border-white/6"
+          : "bg-white/80 border-gray-200/60"
+        }`}
+      style={{ boxShadow: "0 1px 20px rgba(0,0,0,0.06)" }}
+    >
       <div className="flex items-center gap-4">
         <button
-          className={`block lg:hidden transition ${isDarkMode ? "text-slate-400 hover:text-white" : "text-gray-500 hover:text-gray-800"}`}
+          className={`block lg:hidden transition ${isDarkMode
+            ? "text-slate-400 hover:text-white"
+            : "text-gray-500 hover:text-gray-800"
+            }`}
           onClick={() => setOpenSideMenu(!openSideMenu)}
         >
-          {openSideMenu ? <HiOutlineX className="text-2xl" /> : <HiOutlineMenu className="text-2xl" />}
+          {openSideMenu ? (
+            <HiOutlineX className="text-2xl" />
+          ) : (
+            <HiOutlineMenu className="text-2xl" />
+          )}
         </button>
 
         {/* Brand */}
@@ -29,10 +41,16 @@ const Navbar = ({ activeMenu }) => {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-white text-xs font-bold">T</span>
           </div>
-          <h2 className={`text-[15px] font-semibold tracking-tight ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+          <h2
+            className={`text-[15px] font-semibold tracking-tight ${isDarkMode ? "text-white" : "text-gray-800"
+              }`}
+          >
             Task Manager
           </h2>
         </div>
+
+        {/* Workspace switcher — only show for admins */}
+        {user?.role === "admin" && <WorkspaceSwitcher />}
       </div>
 
       {/* Theme Toggle */}
@@ -44,7 +62,11 @@ const Navbar = ({ activeMenu }) => {
             : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"
           }`}
       >
-        {isDarkMode ? <LuSun className="text-sm text-yellow-400" /> : <LuMoon className="text-sm text-slate-500" />}
+        {isDarkMode ? (
+          <LuSun className="text-sm text-yellow-400" />
+        ) : (
+          <LuMoon className="text-sm text-slate-500" />
+        )}
         {isDarkMode ? "Light" : "Dark"}
       </button>
 
@@ -54,7 +76,7 @@ const Navbar = ({ activeMenu }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

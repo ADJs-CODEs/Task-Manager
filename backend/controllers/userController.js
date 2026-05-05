@@ -1,47 +1,48 @@
 const Task = require("../models/Task");
 const User = require("../models/User");
+const Workspace = require("../models/Workspace");
 const jwt = require("jsonwebtoken");
 
-
-//desc Get all users (Admin only)
-//@route GET /api/users/
-//@access Private (Admin)
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
-};
+const generateToken = (userId) =>
+  jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: 'member' }).select("-password");
+    const workspace = await Workspace.findById(req.workspaceId).populate(
+      "members.user", "-password"
+    );
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
 
-    //Add task counts to each user
-    const usersWithTaskCounts = await Promise.all(users.map(async (user) => {
-      const pendingTasks = await Task.countDocuments({ assignedTo: user._id, status: "pending" });
-      const inProgressTasks = await Task.countDocuments({ assignedTo: user._id, status: "In Progress" })
-      const completedTasks = await Task.countDocuments({ assignedTo: user._id, status: "Completed" });
-      return {
-        ...user._doc, //Include all existing user data
-        pendingTasks,
-        inProgressTasks,
-        completedTasks,
-      };
-    }))
+    const members = workspace.members
+      .filter((m) => m.role === "member")
+      .map((m) => m.user);
 
-    res.json(usersWithTaskCounts)
+    const usersWithTaskCounts = await Promise.all(
+      members.map(async (user) => {
+        const pendingTasks = await Task.countDocuments({
+          assignedTo: user._id, status: "Pending", workspaceId: req.workspaceId,
+        });
+        const inProgressTasks = await Task.countDocuments({
+          assignedTo: user._id, status: "In Progress", workspaceId: req.workspaceId,
+        });
+        const completedTasks = await Task.countDocuments({
+          assignedTo: user._id, status: "Completed", workspaceId: req.workspaceId,
+        });
+        return { ...user._doc, pendingTasks, inProgressTasks, completedTasks };
+      })
+    );
 
+    res.json(usersWithTaskCounts);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-//@desc Get user by Id
-//@route GET /api/users/:id
-//@access private(Admin)
+
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password")
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
-
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -56,8 +57,6 @@ const updateUser = async (req, res) => {
     user.email = req.body.email || user.email;
     user.profileImageUrl = req.body.profileImageUrl || user.profileImageUrl;
 
-    //Update User Profile 
-
     const updatedUser = await user.save();
     res.json({
       _id: updatedUser._id,
@@ -68,22 +67,24 @@ const updateUser = async (req, res) => {
       token: generateToken(updatedUser._id),
     });
   } catch (error) {
-    console.error("Update user error:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-// Delete User
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    await user.deleteOne();
-    res.json({ message: "User deleted successfully" });
+    const workspace = await Workspace.findById(req.workspaceId);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    workspace.members = workspace.members.filter(
+      (m) => m.user.toString() !== req.params.id
+    );
+    await workspace.save();
+
+    res.json({ message: "User removed from workspace successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-
-module.exports = { getUsers, getUserById, updateUser, deleteUser }
+module.exports = { getUsers, getUserById, updateUser, deleteUser };
