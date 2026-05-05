@@ -73,10 +73,10 @@ const SideMenu = ({ activeMenu }) => {
           </div>
         )}
 
-        <h5 className="text-white font-semibold text-sm mt-2 tracking-tight">
+        <h5 className={`font-semibold text-sm mt-2 tracking-tight ${isDarkMode ? "text-white" : "text-gray-800"}`}>
           {user?.name || ""}
         </h5>
-        <p className="text-[11px] text-slate-400 mt-0.5">{user?.email || ""}</p>
+        <p className="text-[11px] text-slate-400 mt-0.5 ">{user?.email || ""}</p>
       </div>
 
       {/* Menu Items */}

@@ -79,8 +79,8 @@ const Dashboard = () => {
       <div className='card my-5 '>
         <div >
           <div className='col-span-3'>
-            <h2 className='text-xl md:text-2xl'> Good Morning! {user?.name}</h2>
-            <p className='text-xs md:text-[13px] text-gray-400 mt-1-1.5'>
+            <h2 className='text-xl md:text-2xl text-gray-800'>Good Morning! {user?.name}</h2>
+            <p className='text-xs md:text-[13px] text-gray-500 mt-1'>
               {moment().format("dddd Do MMM YYYY")}
             </p>
           </div>
@@ -124,7 +124,7 @@ const Dashboard = () => {
         <div>
           <div className='card'>
             <div className='flex items-center justify-between'>
-              <h5 className='font-medium'>Task Distribution</h5>
+              <h5 className='font-medium text-gray-800'>Task Distribution</h5>
             </div>
             <CustomPieChart
               data={pieChartData}
@@ -135,7 +135,7 @@ const Dashboard = () => {
         <div>
           <div className='card'>
             <div className='flex items-center justify-between'>
-              <h5 className='font-medium'>Task Priority Levels</h5>
+              <h5 className='font-medium text-gray-800'>Task Distribution</h5>
             </div>
             <CustomBarChart
               data={barChartData}

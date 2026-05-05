@@ -1,10 +1,15 @@
 const Task = require("../models/Task");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 
 //desc Get all users (Admin only)
 //@route GET /api/users/
 //@access Private (Admin)
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({ role: 'member' }).select("-password");
@@ -51,6 +56,8 @@ const updateUser = async (req, res) => {
     user.email = req.body.email || user.email;
     user.profileImageUrl = req.body.profileImageUrl || user.profileImageUrl;
 
+    //Update User Profile 
+
     const updatedUser = await user.save();
     res.json({
       _id: updatedUser._id,
@@ -61,11 +68,22 @@ const updateUser = async (req, res) => {
       token: generateToken(updatedUser._id),
     });
   } catch (error) {
+    console.error("Update user error:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Delete User
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    await user.deleteOne();
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 
-
-
-module.exports = { getUsers, getUserById, updateUser }
+module.exports = { getUsers, getUserById, updateUser, deleteUser }

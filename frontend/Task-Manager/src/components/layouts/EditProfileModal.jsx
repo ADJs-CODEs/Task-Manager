@@ -42,8 +42,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         const uploadRes = await axiosInstance.post(
           API_PATHS.IMAGE.UPLOAD_IMAGE,
           imageForm,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
         );
+        console.log("Upload response:", uploadRes.data);
         profileImageUrl = uploadRes.data.imageUrl || uploadRes.data.url;
       }
 

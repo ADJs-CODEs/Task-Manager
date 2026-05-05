@@ -12,6 +12,8 @@ router.get("/profile", protect, getUserProfile); // Get User Profile
 router.put("/profile", protect, updateUserProfile); // Update User Profile
 
 router.post("/upload-image", protect, upload.single("image"), (req, res) => {
+  console.log("File received:", req.file); // ← add this
+  console.log("Body received:", req.body);
   if (!req.file) {
     return res.status(400).json({ message: "No File Uploaded" })
   }

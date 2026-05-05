@@ -77,7 +77,7 @@ const ManageTask = () => {
         <div className='flex flex-col lg:flex-row lg:items-center justify-between'>
 
           <div className='flex items-center justify-between gap-3'>
-            <h2 className='text-xl md:text-xl font-medium'>My Tasks</h2>
+            <h2 className='text-xl md:text-xl font-medium text-slate-700'>My Tasks</h2>
 
             <button
               className='flex lg:hidden download-btn'
@@ -116,7 +116,7 @@ const ManageTask = () => {
                 progress={item.progress}
                 createdAt={item.createdAt}
                 dueDate={item.dueDate}
-                assignedTo={item.assignedTo?.map((item) => item.profileImageUrl)}
+                assignedTo={item.assignedTo || []}
                 attachmentCount={item.attachments?.length || 0}
                 completedTodoCount={item.completedTodoCount}
                 todoChecklist={item.todoChecklist || []}

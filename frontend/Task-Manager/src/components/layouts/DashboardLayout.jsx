@@ -16,7 +16,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
           <div className="max-[1080px]:hidden">
             <SideMenu activeMenu={activeMenu} />
           </div>
-          <div className={`grow mx-5 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <div className={`grow mx-5 ${isDarkMode ? "text-gray-800" : "text-gray-900"}`}>
             {children}
           </div>
         </div>
