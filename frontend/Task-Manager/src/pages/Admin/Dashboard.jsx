@@ -7,7 +7,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
 import { addThousandSeperator } from '../../utils/helper';
-import InfoCard from '../../components/Cards/infoCard';
+import InfoCard from '../../components/Cards/InfoCard';
 import TaskListTable from '../../components/layouts/TasklistTable';
 import { LuArrowRight } from 'react-icons/lu';
 import CustomPieChart from '../../components/Charts/CustomPieChart';
