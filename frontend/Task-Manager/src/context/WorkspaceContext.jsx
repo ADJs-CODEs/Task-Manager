@@ -9,21 +9,25 @@ const WorkspaceProvider = ({ children }) => {
   const [activeWorkspace, setActiveWorkspace] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all workspaces the admin belongs to
   const fetchWorkspaces = async () => {
     try {
       const response = await axiosInstance.get(API_PATHS.WORKSPACES.GET_MY_WORKSPACES);
       const data = response.data;
       setWorkspaces(data);
 
-      // Restore last active workspace from localStorage or default to first
       const savedId = localStorage.getItem("activeWorkspaceId");
       const saved = data.find((w) => w._id === savedId);
       const toActivate = saved || data[0] || null;
       setActiveWorkspace(toActivate);
       if (toActivate) localStorage.setItem("activeWorkspaceId", toActivate._id);
     } catch (error) {
-      console.error("Error fetching workspaces:", error);
+      // Members don't have access to GET /api/workspaces (adminOnly)
+      // But they already have activeWorkspaceId in localStorage from login
+      // So just set a minimal workspace object so the header gets sent
+      const savedId = localStorage.getItem("activeWorkspaceId");
+      if (savedId) {
+        setActiveWorkspace({ _id: savedId });
+      }
     } finally {
       setLoading(false);
     }

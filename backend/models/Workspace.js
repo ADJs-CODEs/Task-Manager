@@ -12,6 +12,15 @@ const workspaceSchema = new mongoose.Schema(
       },
     ],
     inviteToken: { type: String, unique: true, sparse: true },
+    inviteRole: { type: String, enum: ["admin", "member"], default: "member" },
+    memberNotes: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        note: { type: String, default: "" },
+        color: { type: String, default: "Yellow" },
+        updatedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

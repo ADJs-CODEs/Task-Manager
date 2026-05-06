@@ -45,7 +45,8 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
               { userId, role: "member" }
             )
           } catch (error) {
-            // Silently ignore if already a member
+            console.error("Failed to add workspace member", error);
+            toast.error("Failed to add one or more selected users to the workspace.");
           }
         }
       }
@@ -66,6 +67,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
       toast.success(`Invite sent to ${inviteEmail}!`)
       setInviteEmail('')
     } catch (error) {
+      console.error("Invite failed", error)
       toast.error('Failed to send invite. Please try again.')
     } finally {
       setInviteLoading(false)
@@ -83,6 +85,12 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
   useEffect(() => {
     if (selectedUsers.length === 0) setTempSelectedUsers([])
   }, [selectedUsers])
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setTempSelectedUsers(selectedUsers || [])
+    }
+  }, [isModalOpen, selectedUsers])
 
   return (
     <div className='space-y-4 mt-2'>
@@ -102,7 +110,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
 
         {/* Invite by email */}
         <div className='flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100'>
-          <LuMail className='text-blue-500 text-lg flex-shrink-0' />
+          <LuMail className='text-blue-500 text-lg shrink-0' />
           <input
             type="email"
             placeholder="Invite new member by email..."
@@ -131,7 +139,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
               <div key={user._id} className='flex items-center gap-4 p-3 border-b border-gray-200'>
 
                 {user.profileImageUrl ? (
-                  <div className='relative w-10 h-10 flex-shrink-0'>
+                  <div className='relative w-10 h-10 shrink-0'>
                     <img
                       src={user.profileImageUrl}
                       alt={user.name}
@@ -149,7 +157,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm flex-shrink-0'>
+                  <div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm shrink-0'>
                     {user.name?.charAt(0).toUpperCase()}
                   </div>
                 )}

@@ -14,7 +14,10 @@ export const API_PATHS = {
     UPDATE_WORKSPACE: (id) => `/api/workspaces/${id}`,
     DELETE_WORKSPACE: (id) => `/api/workspaces/${id}`,
     INVITE_TO_WORKSPACE: (id) => `/api/workspaces/${id}/invite`,
+    ADD_MEMBER: (id) => `/api/workspaces/${id}/members`,
     JOIN_WORKSPACE: "/api/workspaces/join",
+    GET_MEMBER_NOTE: (workspaceId, userId) => `/api/workspaces/${workspaceId}/notes/${userId}`,
+    SAVE_MEMBER_NOTE: (workspaceId, userId) => `/api/workspaces/${workspaceId}/notes/${userId}`
   },
   USERS: {
     GET_ALL_USERS: "/api/users",
@@ -34,6 +37,8 @@ export const API_PATHS = {
     DELETE_TASK: (taskId) => `/api/tasks/${taskId}`,
     UPDATE_TASK_STATUS: (taskId) => `/api/tasks/${taskId}/status`,
     UPDATE_TODO_CHECKLIST: (taskId) => `/api/tasks/${taskId}/todo`,
+    SAVE_TASK_NOTE: (taskId) => `/api/tasks/${taskId}/note`,
+    REACT_TO_TASK_NOTE: (taskId) => `/api/tasks/${taskId}/react`,
   },
   REPORTS: {
     EXPORT_TASKS: "/api/reports/export/tasks",

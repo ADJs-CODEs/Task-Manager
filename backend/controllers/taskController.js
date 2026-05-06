@@ -1,5 +1,24 @@
 const Task = require("../models/Task");
+const Workspace = require("../models/Workspace");
 const mongoose = require("mongoose");
+
+const addUsersToWorkspaceIfMissing = async (workspaceId, userIds) => {
+  if (!Array.isArray(userIds) || userIds.length === 0) return;
+
+  const workspace = await Workspace.findById(workspaceId);
+  if (!workspace) throw new Error("Workspace not found");
+
+  const existingMemberIds = workspace.members.map((member) => member.user.toString());
+  const usersToAdd = userIds.filter((userId) => !existingMemberIds.includes(userId));
+
+  if (usersToAdd.length === 0) return;
+
+  usersToAdd.forEach((userId) => {
+    workspace.members.push({ user: userId, role: "member" });
+  });
+
+  await workspace.save();
+};
 
 const getTasks = async (req, res) => {
   try {
@@ -72,6 +91,8 @@ const createTask = async (req, res) => {
       attachments,
     });
 
+    await addUsersToWorkspaceIfMissing(req.workspaceId, assignedTo);
+
     res.status(201).json({ message: "Task created successfully", task });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -89,6 +110,9 @@ const updateTask = async (req, res) => {
     task.dueDate = req.body.dueDate || task.dueDate;
     task.todoChecklist = req.body.todoChecklist || task.todoChecklist;
     task.attachments = req.body.attachments || task.attachments;
+    // ✅ Fix — preserve sticky note on update
+    task.stickyNote = req.body.stickyNote ?? task.stickyNote;
+    task.stickyNoteColor = req.body.stickyNoteColor || task.stickyNoteColor;
 
     if (req.body.assignedTo) {
       if (!Array.isArray(req.body.assignedTo)) {
@@ -103,7 +127,6 @@ const updateTask = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 const deleteTask = async (req, res) => {
   try {
     const task = await Task.findOne({ _id: req.params.id, workspaceId: req.workspaceId });
@@ -276,8 +299,57 @@ const getUserDashboardData = async (req, res) => {
   }
 };
 
+// Save sticky note on task (Admin only)
+const saveTaskNote = async (req, res) => {
+  try {
+    const { stickyNote, stickyNoteColor } = req.body;
+    const task = await Task.findOne({ _id: req.params.id, workspaceId: req.workspaceId });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    task.stickyNote = stickyNote;
+    task.stickyNoteColor = stickyNoteColor || "Yellow";
+    await task.save();
+
+    res.json({ message: "Note saved", stickyNote, stickyNoteColor });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// React to task sticky note
+const reactToTaskNote = async (req, res) => {
+  try {
+    const { emoji } = req.body;
+    const task = await Task.findOne({ _id: req.params.id, workspaceId: req.workspaceId });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const existingReaction = task.reactions.find(
+      (r) => r.userId.toString() === req.user._id.toString()
+    );
+
+    if (existingReaction) {
+      if (existingReaction.emoji === emoji) {
+        // Toggle off if same emoji
+        task.reactions = task.reactions.filter(
+          (r) => r.userId.toString() !== req.user._id.toString()
+        );
+      } else {
+        existingReaction.emoji = emoji;
+      }
+    } else {
+      task.reactions.push({ userId: req.user._id, emoji });
+    }
+
+    await task.save();
+    res.json({ message: "Reaction updated", reactions: task.reactions });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   getTasks, getTaskById, createTask, updateTask,
   deleteTask, updateTaskStatus, updateTaskChecklist,
   getDashboardData, getUserDashboardData,
+  saveTaskNote, reactToTaskNote,
 };

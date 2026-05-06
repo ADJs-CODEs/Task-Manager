@@ -14,6 +14,7 @@ import TodoListInput from '../../components/Inputs/TodoListInput';
 import AddAttachmentsInput from '../../components/Inputs/AddAttachmentsInput';
 import Modal from '../../components/layouts/Model'
 import DeleteAlert from "../../components/layouts/DeleteAlert"
+import { TaskNoteEditor } from '../../components/Cards/TaskStickyNote';
 
 const CreateTask = () => {
 
@@ -28,7 +29,9 @@ const CreateTask = () => {
     dueDate: "",
     assignedTo: [],
     todoChecklist: [],
-    attachments: []
+    attachments: [],
+    stickyNote: "",
+    stickyNoteColor: "Yellow",
   });
 
   const [currentTask, setCurrentTask] = useState(null);
@@ -170,6 +173,8 @@ const CreateTask = () => {
           todoChecklist:
             taskInfo?.todoChecklist?.map((item) => item?.text),
           attachments: taskInfo?.attachments || [],
+          stickyNote: taskInfo?.stickyNote || "",
+          stickyNoteColor: taskInfo?.stickyNoteColor || "Yellow",
         }))
       }
     } catch (error) {
@@ -180,11 +185,11 @@ const CreateTask = () => {
   //Delete Task
   const deleteTask = async () => {
     try {
-      await axiosInstance.delete(API_PATHS.DELETE_TASKS(taskId));
+      await axiosInstance.delete(API_PATHS.TASKS.DELETE_TASK(taskId));
 
-      setOpenDeleteAlert(fasle);
+      setOpenDeleteAlert(false);
       toast.success("Expense details deleted successfully");
-      navigate('admin/tasks')
+      navigate('/admin/tasks')
     } catch (error) {
       console.error("Error deleting expense:", error.response?.data?.message || error.messsage)
     }
@@ -308,6 +313,18 @@ const CreateTask = () => {
                 setAttachments={(value) =>
                   handleValueChange("attachments", value)
                 } />
+
+              <div className='mt-3'>
+                <label className='text-xs font-medium text-slate-600'>
+                  Admin Note (visible to assignees)
+                </label>
+                <TaskNoteEditor
+                  note={taskData.stickyNote}
+                  color={taskData.stickyNoteColor}
+                  onChange={(val) => handleValueChange("stickyNote", val)}
+                  onColorChange={(val) => handleValueChange("stickyNoteColor", val)}
+                />
+              </div>
             </div>
 
             {error && (
@@ -333,7 +350,7 @@ const CreateTask = () => {
         title="Delete Task" >
         <DeleteAlert
           content="Are you sure you want to delete this task?"
-          openDelete={() => deleteTask()}
+          onDelete={() => deleteTask()}
         />
       </Modal>
     </DashboardLayout>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
@@ -7,10 +7,16 @@ import moment from 'moment';
 import AvatarGroup from '../../components/layouts/AvatarGroup';
 import { LuSquareArrowOutUpRight } from 'react-icons/lu';
 
+import { TaskNoteViewer } from '../../components/Cards/TaskStickyNote';
+import { UserContext } from '../../context/userContext';
+
+
+
 const ViewTaskDetails = () => {
 
   const { id } = useParams();
   const [task, setTask] = useState(null);
+  const { user } = useContext(UserContext);
 
   const getStatusTagcolor = (status) => {
     switch (status) {
@@ -64,9 +70,23 @@ const ViewTaskDetails = () => {
     }
   };
 
+  //hanle React
+
+  const handleReact = async (emoji) => {
+    try {
+      const response = await axiosInstance.post(
+        API_PATHS.TASKS.REACT_TO_TASK_NOTE(id),
+        { emoji }
+      );
+      setTask(prev => ({ ...prev, reactions: response.data.reactions }));
+    } catch (error) {
+      console.error('Error reacting:', error);
+    }
+  };
+
   //Handle attachment link click
   const handleLinkClick = (link) => {
-    if (!/^https?:\/\//i.text(link)) {
+    if (!/^https?:\/\//i.test(link)) {
       link = "https://" + link; //Default to HTTPS
     }
     window.open(link, "_blank");
@@ -152,6 +172,16 @@ const ViewTaskDetails = () => {
                   />))}
               </div>
             )}
+
+            {task?.stickyNote && (
+              <TaskNoteViewer
+                note={task.stickyNote}
+                color={task.stickyNoteColor}
+                reactions={task.reactions || []}
+                onReact={handleReact}
+                currentUserId={user?._id}
+              />
+            )}
           </div>
         </div>
         )}
@@ -194,5 +224,7 @@ const Attachment = ({ link, index, onClick }) => {
     </div>
 
     <LuSquareArrowOutUpRight className='text-gray-400 text-lg' />
+
+
   </div>
 }

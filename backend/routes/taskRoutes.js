@@ -4,6 +4,7 @@ const { resolveWorkspace } = require("../middlewares/workspaceMiddleware");
 const {
   getDashboardData, getUserDashboardData, getTasks, getTaskById,
   createTask, updateTask, deleteTask, updateTaskStatus, updateTaskChecklist,
+  saveTaskNote, reactToTaskNote,
 } = require("../controllers/taskController");
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.put("/:id", protect, resolveWorkspace, updateTask);
 router.delete("/:id", protect, adminOnly, resolveWorkspace, deleteTask);
 router.put("/:id/status", protect, resolveWorkspace, updateTaskStatus);
 router.put("/:id/todo", protect, resolveWorkspace, updateTaskChecklist);
+router.put("/:id/note", protect, adminOnly, resolveWorkspace, saveTaskNote);
+router.post("/:id/react", protect, resolveWorkspace, reactToTaskNote);
 
 module.exports = router;

@@ -5,6 +5,11 @@ const todoSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
 });
 
+const reactionSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  emoji: { type: String },
+});
+
 const taskSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -18,6 +23,9 @@ const taskSchema = new mongoose.Schema(
     attachments: [{ type: String }],
     todoChecklist: [todoSchema],
     progress: { type: Number, default: 0 },
+    stickyNote: { type: String, default: "" },
+    stickyNoteColor: { type: String, default: "Yellow" },
+    reactions: [reactionSchema],
   },
   { timestamps: true }
 );

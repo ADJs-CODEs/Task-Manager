@@ -85,7 +85,7 @@ const deleteWorkspace = async (req, res) => {
 
 const inviteAdminToWorkspace = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, role = "member" } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required" });
 
     const workspace = await Workspace.findById(req.params.id);
@@ -98,6 +98,7 @@ const inviteAdminToWorkspace = async (req, res) => {
 
     const inviteToken = crypto.randomBytes(20).toString("hex");
     workspace.inviteToken = inviteToken;
+    workspace.inviteRole = role;
     await workspace.save();
 
     await sendInviteEmail({
@@ -106,6 +107,7 @@ const inviteAdminToWorkspace = async (req, res) => {
       inviteToken,
       workspaceName: workspace.name,
       workspaceId: workspace._id,
+      role
     });
 
     res.json({ message: `Invite sent to ${email}` });
@@ -127,7 +129,8 @@ const joinWorkspace = async (req, res) => {
     );
     if (alreadyMember) return res.status(400).json({ message: "Already a member of this workspace" });
 
-    workspace.members.push({ user: req.user._id, role: "admin" });
+    workspace.members.push({ user: req.user._id, role: workspace.inviteRole || "member" });
+    workspace.inviteRole = undefined;
     await workspace.save();
 
     res.json({ message: "Joined workspace successfully", workspace });
@@ -136,12 +139,76 @@ const joinWorkspace = async (req, res) => {
   }
 };
 
+const addMemberToWorkspace = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    const alreadyMember = workspace.members.some(
+      (m) => m.user.toString() === userId
+    );
+    if (alreadyMember) return res.status(400).json({ message: "Already a member" });
+
+    workspace.members.push({ user: userId, role: role || "member" });
+    await workspace.save();
+
+    res.json({ message: "Member added successfully", workspace });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Get sticky note for a member
+const getMemberNote = async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    const note = workspace.memberNotes?.find(
+      (n) => n.userId.toString() === req.params.userId
+    );
+
+    res.json({ note: note?.note || "", color: note?.color || "Yellow" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Save sticky note for a member
+const saveMemberNote = async (req, res) => {
+  try {
+    const { note, color } = req.body;
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    const existing = workspace.memberNotes?.find(
+      (n) => n.userId.toString() === req.params.userId
+    );
+
+    if (existing) {
+      existing.note = note;
+      existing.color = color || "Yellow";
+      existing.updatedAt = new Date();
+    } else {
+      workspace.memberNotes.push({
+        userId: req.params.userId,
+        note,
+        color: color || "Yellow",
+        updatedAt: new Date(),
+      });
+    }
+
+    await workspace.save();
+    res.json({ message: "Note saved", note, color });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
-  createWorkspace,
-  getMyWorkspaces,
-  getWorkspaceById,
-  updateWorkspace,
-  deleteWorkspace,
-  inviteAdminToWorkspace,
-  joinWorkspace,
+  createWorkspace, getMyWorkspaces, getWorkspaceById,
+  updateWorkspace, deleteWorkspace, inviteAdminToWorkspace,
+  joinWorkspace, addMemberToWorkspace,
+  getMemberNote, saveMemberNote,
 };

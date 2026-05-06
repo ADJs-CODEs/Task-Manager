@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useWorkspace } from "../../context/WorkspaceContext";
-import { LuChevronDown, LuPlus, LuCheck, LuTrash2 } from "react-icons/lu";
+import { LuChevronDown, LuPlus, LuCheck, LuTrash2, LuUsers } from "react-icons/lu";
 import { useTheme } from "../../context/ThemeContext";
 import CreateWorkspaceModal from "./CreateWorkspaceModal";
 import axiosInstance from "../../utils/axiosInstance";
@@ -8,11 +8,29 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 
 const WorkspaceSwitcher = () => {
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('member');
+  const [showInvite, setShowInvite] = useState(false);
   const { workspaces, activeWorkspace, switchWorkspace, removeWorkspace } = useWorkspace();
   const { isDarkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const dropdownRef = useRef(null);
+
+  const handleInvite = async () => {
+    if (!inviteEmail.trim()) return;
+    try {
+      await axiosInstance.post(API_PATHS.WORKSPACES.INVITE_TO_WORKSPACE(activeWorkspace._id), {
+        email: inviteEmail,
+        role: inviteRole,
+      });
+      toast.success(`Invite sent to ${inviteEmail}`);
+      setInviteEmail('');
+      setShowInvite(false);
+    } catch {
+      toast.error('Failed to send invite');
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -117,6 +135,40 @@ const WorkspaceSwitcher = () => {
 
             {/* Create new workspace */}
             <div className={`border-t ${isDarkMode ? "border-white/10" : "border-gray-100"}`}>
+              <div className={`border-t ${isDarkMode ? "border-white/10" : "border-gray-100"}`}>
+                {showInvite ? (
+                  <div className="p-3 space-y-2">
+                    <input
+                      type="email"
+                      placeholder="Email address"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-blue-400"
+                    />
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value)}
+                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none"
+                    >
+                      <option value="member">Member</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <div className="flex gap-2">
+                      <button onClick={() => setShowInvite(false)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-200 text-gray-500">Cancel</button>
+                      <button onClick={handleInvite} className="flex-1 text-xs py-1.5 rounded-lg bg-blue-600 text-white font-medium">Send</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setShowInvite(true); }}
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors
+        ${isDarkMode ? "text-green-400 hover:bg-white/5" : "text-green-600 hover:bg-green-50"}`}
+                  >
+                    <LuUsers className="text-base" />
+                    Invite to Workspace
+                  </button>
+                )}
+              </div>
               <button
                 onClick={() => { setIsOpen(false); setShowCreateModal(true); }}
                 className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors
