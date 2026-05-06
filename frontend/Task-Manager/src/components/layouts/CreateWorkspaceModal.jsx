@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { HiOutlineX } from "react-icons/hi";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -33,8 +34,8 @@ const CreateWorkspaceModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 relative">
         <button
           onClick={onClose}
@@ -89,7 +90,8 @@ const CreateWorkspaceModal = ({ isOpen, onClose }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body // ← renders directly on body, escapes navbar
   );
 };
 

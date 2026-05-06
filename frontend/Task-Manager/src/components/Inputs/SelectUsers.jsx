@@ -17,7 +17,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
 
   const getAllUsers = async () => {
     try {
-      const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS)
+      const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS_GLOBAL)
       if (response.data?.length > 0) {
         setAllUsers(response.data)
       }
@@ -34,7 +34,22 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
     )
   }
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
+    // Auto-add newly selected users to the workspace
+    if (activeWorkspace) {
+      for (const userId of tempSelectedUsers) {
+        if (!selectedUsers.includes(userId)) {
+          try {
+            await axiosInstance.post(
+              API_PATHS.WORKSPACES.ADD_MEMBER(activeWorkspace._id),
+              { userId, role: "member" }
+            )
+          } catch (error) {
+            // Silently ignore if already a member
+          }
+        }
+      }
+    }
     setSelectedUsers(tempSelectedUsers)
     setIsModalOpen(false)
   }
@@ -84,12 +99,13 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
       )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Select Users">
+
         {/* Invite by email */}
         <div className='flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100'>
           <LuMail className='text-blue-500 text-lg flex-shrink-0' />
           <input
             type="email"
-            placeholder="Invite member by email..."
+            placeholder="Invite new member by email..."
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
             className='flex-1 text-sm bg-transparent outline-none text-gray-700 placeholder-gray-400'
@@ -108,11 +124,12 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         <div className='space-y-4 h-[60vh] overflow-y-auto'>
           {allUsers.length === 0 ? (
             <div className='text-center py-10 text-gray-400 text-sm'>
-              No members in this workspace yet. Invite someone above!
+              No users found. Invite someone above!
             </div>
           ) : (
             allUsers.map((user) => (
               <div key={user._id} className='flex items-center gap-4 p-3 border-b border-gray-200'>
+
                 {user.profileImageUrl ? (
                   <div className='relative w-10 h-10 flex-shrink-0'>
                     <img
@@ -154,8 +171,12 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         </div>
 
         <div className='flex justify-end gap-4 pt-4'>
-          <button className='card-btn' onClick={() => setIsModalOpen(false)}>CANCEL</button>
-          <button className='card-btn-fill' onClick={handleAssign}>DONE</button>
+          <button className='card-btn' onClick={() => setIsModalOpen(false)}>
+            CANCEL
+          </button>
+          <button className='card-btn-fill' onClick={handleAssign}>
+            DONE
+          </button>
         </div>
       </Modal>
     </div>

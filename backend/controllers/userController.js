@@ -1,7 +1,11 @@
 const Task = require("../models/Task");
+
 const User = require("../models/User");
 const Workspace = require("../models/Workspace");
 const jwt = require("jsonwebtoken");
+
+
+console.log("userController loaded");
 
 const generateToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -87,4 +91,13 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getUserById, updateUser, deleteUser };
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: "member" }).select("-password");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { getUsers, getUserById, updateUser, deleteUser, getAllUsers };
