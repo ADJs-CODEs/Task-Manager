@@ -10,7 +10,7 @@ const exportTaskReport = async (req, res) => {
   try {
     const tasks = await Task.find({ workspaceId: req.workspaceId }).populate(
       "assignedTo",
-      "name email"
+      "name email",
     );
 
     const workbook = new excelJS.Workbook();
@@ -36,25 +36,29 @@ const exportTaskReport = async (req, res) => {
         description: task.description,
         priority: task.priority,
         status: task.status,
-        dueDate: task.dueDate ? task.dueDate.toISOString().split("T")[0] : "N/A",
+        dueDate: task.dueDate
+          ? task.dueDate.toISOString().split("T")[0]
+          : "N/A",
         assignedTo: assignedTo || "Unassigned",
       });
     });
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="tasks_report.xlsx"'
+      'attachment; filename="tasks_report.xlsx"',
     );
 
     return workbook.xlsx.write(res).then(() => {
       res.end();
     });
   } catch (error) {
-    res.status(500).json({ message: "Error exporting tasks", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error exporting tasks", error: error.message });
   }
 };
 
@@ -65,14 +69,13 @@ const exportUsersReport = async (req, res) => {
   try {
     const workspace = await Workspace.findById(req.workspaceId).populate(
       "members.user",
-      "name email _id"
+      "name email _id",
     );
 
     const members = workspace.members.map((m) => m.user);
-    const userTasks = await Task.find({ workspaceId: req.workspaceId }).populate(
-      "assignedTo",
-      "name email _id"
-    );
+    const userTasks = await Task.find({
+      workspaceId: req.workspaceId,
+    }).populate("assignedTo", "name email _id");
 
     const userTaskMap = {};
     members.forEach((user) => {
@@ -121,18 +124,20 @@ const exportUsersReport = async (req, res) => {
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="users_report.xlsx"'
+      'attachment; filename="users_report.xlsx"',
     );
 
     return workbook.xlsx.write(res).then(() => {
       res.end();
     });
   } catch (error) {
-    res.status(500).json({ message: "Error exporting users", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error exporting users", error: error.message });
   }
 };
 
