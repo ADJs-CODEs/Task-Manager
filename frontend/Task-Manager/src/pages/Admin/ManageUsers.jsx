@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import DashboardLayout from '../../components/layouts/DashboardLayout'
-import axiosInstance from '../../utils/axiosInstance';
-import { API_PATHS } from '../../utils/apiPaths';
-import { LuFileSpreadsheet } from 'react-icons/lu';
-import UserCard from '../../components/Cards/UserCard';
+import React, { useState, useEffect } from "react";
+import DashboardLayout from "../../components/layouts/DashboardLayout";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import { LuFileSpreadsheet } from "react-icons/lu";
+import UserCard from "../../components/Cards/UserCard";
 import toast from "react-hot-toast";
-import Modal from '../../components/layouts/Model';
-import DeleteAlert from '../../components/layouts/DeleteAlert';
+import Modal from "../../components/layouts/Model";
+import DeleteAlert from "../../components/layouts/DeleteAlert";
 
 const ManageUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -61,21 +61,24 @@ const ManageUsers = () => {
 
   useEffect(() => {
     getAllUsers();
-    return () => { };
+    return () => {};
   }, []);
 
   return (
     <DashboardLayout activeMenu="Team Members">
-      <div className='mt-5 mb-10'>
-        <div className='flex md:flex-row md:items-center justify-between'>
-          <h2 className='text-xl font-medium'>Team Members</h2>
-          <button className='flex items-center gap-2 download-btn' onClick={handleDownloadReport}>
+      <div className="mt-5 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h2 className="text-xl font-medium">Team Members</h2>
+          <button
+            className="flex items-center gap-2 download-btn w-fit"
+            onClick={handleDownloadReport}
+          >
             <LuFileSpreadsheet className="text-lg" />
             Download Report
           </button>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           {allUsers?.map((user) => (
             <UserCard
               key={user._id}
@@ -97,7 +100,7 @@ const ManageUsers = () => {
         />
       </Modal>
     </DashboardLayout>
-  )
-}
+  );
+};
 
-export default ManageUsers
+export default ManageUsers;

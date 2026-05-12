@@ -72,7 +72,9 @@ export const TaskNoteViewer = ({ note, color, reactions, onReact, currentUserId 
   // Group reactions by emoji
   const groupedReactions = EMOJIS.reduce((acc, emoji) => {
     const count = reactions?.filter(r => r.emoji === emoji).length || 0;
-    const reacted = reactions?.some(r => r.emoji === emoji && r.userId === currentUserId);
+const reacted = reactions?.some(
+  r => r.emoji === emoji && r.userId?.toString() === currentUserId?.toString()
+);
     if (count > 0 || true) acc[emoji] = { count, reacted };
     return acc;
   }, {});

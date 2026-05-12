@@ -73,26 +73,21 @@ const getTaskById = async (req, res) => {
 
 const createTask = async (req, res) => {
   try {
-    const { title, description, priority, dueDate, assignedTo, attachments, todoChecklist } = req.body;
-
-    if (!Array.isArray(assignedTo)) {
-      return res.status(400).json({ message: "assignedTo must be an array of user IDs" });
-    }
+    const { 
+      title, description, priority, dueDate, assignedTo, 
+      attachments, todoChecklist, stickyNote, stickyNoteColor // ✅ add these
+    } = req.body;
 
     const task = await Task.create({
-      title,
-      description,
-      priority,
-      dueDate,
-      assignedTo,
+      title, description, priority, dueDate, assignedTo,
       createdBy: req.user._id,
       workspaceId: req.workspaceId,
-      todoChecklist,
-      attachments,
+      todoChecklist, attachments,
+      stickyNote: stickyNote || "",           // ✅ add
+      stickyNoteColor: stickyNoteColor || "Yellow", // ✅ add
     });
 
     await addUsersToWorkspaceIfMissing(req.workspaceId, assignedTo);
-
     res.status(201).json({ message: "Task created successfully", task });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

@@ -248,8 +248,8 @@ const CreateTask = () => {
               ></textarea>
             </div>
 
-            <div className="grid grid-cols-12 gap-4 mt-2">
-              <div className='cols-span-6 md:col-span-4'>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-2">
+              <div className=' md:col-span-4'>
                 <label className="text-xs font medium text-slate-600">
                   Priority
                 </label>
@@ -261,7 +261,7 @@ const CreateTask = () => {
                   placeholder="Select Priority" />
               </div>
 
-              <div className='col-span-6 md:col-span-4'>
+              <div className='md:col-span-4'>
                 <label className='text-xs font-medium text-slate-600'>
                   Due Date
                 </label>
@@ -276,7 +276,7 @@ const CreateTask = () => {
                   type="date" />
               </div>
 
-              <div className='col-span-12 md:col-span-3'>
+              <div className=' md:col-span-4'>
                 <label className='text-xs font-medium text-slate-600'>
                   Assign To
                 </label>
