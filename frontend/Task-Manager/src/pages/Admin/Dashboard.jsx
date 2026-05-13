@@ -47,6 +47,13 @@ const Dashboard = () => {
     setBarChartData(PriorityLevelData);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   const getDashboardData = async () => {
     try {
       const response = await axiosInstance.get(
@@ -77,7 +84,7 @@ const Dashboard = () => {
         <div>
           <div className="col-span-3">
             <h2 className="text-lg md:text-2xl text-gray-800">
-              Good Morning! {user?.name}
+              {getGreeting()}! {user?.name}
             </h2>
             <p className="text-xs md:text-[13px] text-gray-500 mt-1">
               {moment().format("dddd Do MMM YYYY")}
